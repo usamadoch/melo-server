@@ -4,6 +4,10 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import authRoutes from './auth/authRoutes.js';
+import profilesRoutes from './profiles/profileRoutes.js';
+import interestsRoutes from './interests/interestsRoutes.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 
 dotenv.config();
 
@@ -23,6 +27,12 @@ app.use(express.json());
 app.get('/api', (req, res) => {
   res.json({ message: 'melo.tv API server running' });
 });
+
+app.use('/api/auth', authRoutes);
+app.use('/api/profile', profilesRoutes);
+app.use('/api/interests', interestsRoutes);
+
+app.use(errorHandler);
 
 // Socket.io initialization
 io.on('connection', (socket) => {
