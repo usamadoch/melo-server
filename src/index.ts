@@ -8,6 +8,7 @@ import authRoutes from './auth/authRoutes.js';
 import profilesRoutes from './profiles/profileRoutes.js';
 import interestsRoutes from './interests/interestsRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { setupMatchingHandler } from './sockets/matchingHandler.js';
 
 dotenv.config();
 
@@ -36,11 +37,10 @@ app.use(errorHandler);
 
 // Socket.io initialization
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
+  setupMatchingHandler(io, socket);
+
+  socket.on('disconnect', () => {});
 });
 
 const PORT = process.env.PORT || 5000;
