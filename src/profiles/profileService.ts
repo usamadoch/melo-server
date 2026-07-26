@@ -34,4 +34,26 @@ export class ProfileService {
     }
     return profile;
   }
+
+  static async getExploreData(onlineUserIds: string[]) {
+    return ProfileRepository.getExploreData(onlineUserIds);
+  }
+
+  static async getPublicProfileData(userId: string) {
+    const profile = await ProfileRepository.findByUserId(userId);
+    const user = await UserRepository.findById(userId);
+    
+    if (!profile || !user) {
+      throw new NotFoundError('Profile not found');
+    }
+
+    return {
+      id: userId,
+      name: user.name,
+      avatar: user.avatar,
+      bio: profile.bio,
+      conversationTitle: profile.conversationTitle,
+      interests: profile.interests
+    };
+  }
 }

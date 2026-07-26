@@ -6,6 +6,8 @@ const router = Router();
 
 router.post('/', requireAuth, ProfileController.createProfile);
 router.get('/me', requireAuth, ProfileController.getMyProfile);
+router.get('/explore', requireAuth, ProfileController.getExploreProfiles);
+router.get('/:userId/public', requireAuth, ProfileController.getPublicProfile);
 router.patch('/', requireAuth, ProfileController.updateProfile);
 
 export default router;

@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { addUserToQueue, removeUserFromQueue, removeUserFromQueueBySocket, findMatch } from '../matching/matchingService.js';
 
 function getMatchRooms(socket: Socket) {
-  return Array.from(socket.rooms).filter(r => r.startsWith('room_'));
+  return Array.from(socket.rooms).filter(r => r.startsWith('room_') && !r.startsWith('direct_room_'));
 }
 
 function leaveAllMatchRooms(socket: Socket) {
