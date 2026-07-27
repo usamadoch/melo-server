@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import authRoutes from './auth/authRoutes.js';
 import profilesRoutes from './profiles/profileRoutes.js';
 import interestsRoutes from './interests/interestsRoutes.js';
+import reportsRoutes from './reports/reportsRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { setupMatchingHandler } from './sockets/matchingHandler.js';
 import { setupChatRequestHandler } from './sockets/chatRequestHandler.js';
@@ -35,6 +36,7 @@ app.get('/api', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profilesRoutes);
 app.use('/api/interests', interestsRoutes);
+app.use('/api/reports', reportsRoutes);
 
 app.use(errorHandler);
 

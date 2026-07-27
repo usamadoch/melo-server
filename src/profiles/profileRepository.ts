@@ -65,7 +65,8 @@ export class ProfileRepository {
                 avatar: '$user.avatar',
                 bio: 1,
                 conversationTitle: 1,
-                interests: 1
+                interests: 1,
+                exploreThumbnail: 1
               }
             }
           ],

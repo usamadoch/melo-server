@@ -6,6 +6,7 @@ export interface IProfile extends Document {
   conversationTitle?: string;
   interests: string[];
   showOnExplore: boolean;
+  exploreThumbnail?: string;
   allowRandomMatching: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -18,6 +19,7 @@ const ProfileSchema: Schema = new Schema(
     conversationTitle: { type: String, maxlength: 100 },
     interests: [{ type: String }],
     showOnExplore: { type: Boolean, default: true },
+    exploreThumbnail: { type: String },
     allowRandomMatching: { type: Boolean, default: true },
   },
   { timestamps: true }

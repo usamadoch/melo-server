@@ -64,7 +64,20 @@ export class ProfileController {
         throw new UnauthorizedError('User not authenticated');
       }
       const { userId } = req.params;
-      const data = await ProfileService.getPublicProfileData(userId);
+      const data = await ProfileService.getPublicProfileData(userId as string);
+      res.json(data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getUploadUrl(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new UnauthorizedError('User not authenticated');
+      }
+      const fileType = (req.query.fileType as string) || 'image/jpeg';
+      const data = await ProfileService.getUploadUrl(req.user._id as string, fileType);
       res.json(data);
     } catch (error) {
       next(error);
