@@ -21,6 +21,6 @@ export class UserRepository {
   }
 
   static async updateOnboardingCompleted(id: string, onboardingCompleted: boolean): Promise<IUser | null> {
-    return User.findByIdAndUpdate(id, { onboardingCompleted }, { new: true }).exec();
+    return User.findByIdAndUpdate(id, { onboardingCompleted }, { returnDocument: 'after' }).exec();
   }
 }

@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { getSocketIdForUser } from './onlineUsersManager.js';
 import { User } from '../models/User.js';
 import { Profile } from '../models/Profile.js';
+import { finalizeMatch } from '../ratings/feedbackService.js';
 
 const pendingRequests = new Map<string, Set<string>>();
 
@@ -77,6 +78,8 @@ export function setupChatRequestHandler(io: Server, socket: Socket) {
     if (roomId && roomId.startsWith('direct_room_')) {
       socket.to(roomId).emit('call_ended');
       socket.leave(roomId);
+      // Fire and forget finalizeMatch for this room
+      finalizeMatch(roomId).catch(err => console.error('Error finalizing match:', err));
     }
   });
 

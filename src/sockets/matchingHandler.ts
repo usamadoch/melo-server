@@ -8,6 +8,7 @@ import {
   matchEmitter,
   type MatchResult,
 } from '../matching/matchingService.js';
+import { finalizeMatch } from '../ratings/feedbackService.js';
 
 function getMatchRooms(socket: Socket) {
   return Array.from(socket.rooms).filter(r => r.startsWith('room_') && !r.startsWith('direct_room_'));
@@ -18,6 +19,8 @@ function leaveAllMatchRooms(socket: Socket) {
   for (const r of rooms) {
     socket.to(r).emit('peer_disconnected');
     socket.leave(r);
+    // Fire and forget finalizeMatch for this room
+    finalizeMatch(r).catch(err => console.error('Error finalizing match:', err));
   }
 }
 
@@ -54,9 +57,9 @@ export function setupMatchingHandler(io: Server, socket: Socket) {
       peerSocket.join(result.roomId);
     }
 
-    socket.emit('match_found', { remoteUserId: peer.userId, initiator: isInitiator });
+    socket.emit('match_found', { remoteUserId: peer.userId, initiator: isInitiator, roomId: result.roomId });
     if (peerSocket) {
-      peerSocket.emit('match_found', { remoteUserId: userId, initiator: !isInitiator });
+      peerSocket.emit('match_found', { remoteUserId: userId, initiator: !isInitiator, roomId: result.roomId });
     }
   };
 
