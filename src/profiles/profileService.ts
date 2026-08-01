@@ -6,6 +6,7 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { s3Client } from '../utils/s3.js';
 import { env } from '../config/env.js';
+import { buildUserVector } from '../matching/embeddingService.js';
 
 export class ProfileService {
   static async getUploadUrl(userId: string, fileType: string) {
@@ -29,15 +30,30 @@ export class ProfileService {
 
     return { uploadUrl, publicUrl };
   }
+
   static async createProfile(userId: string, profileData: Omit<CreateProfileData, 'userId'>): Promise<IProfile> {
     const existingProfile = await ProfileRepository.findByUserId(userId);
     if (existingProfile) {
       throw new BadRequestError('Profile already exists');
     }
 
+    // Generate interest vector via Gemini embeddings
+    let interestVector: number[] = [];
+    try {
+      interestVector = await buildUserVector(
+        profileData.categories || [],
+        profileData.subcategories || [],
+        profileData.freeTextInterest
+      );
+    } catch (err) {
+      console.error('[ProfileService] Failed to generate interest vector:', err);
+      // Continue without vector — fallback matching will be used
+    }
+
     const profile = await ProfileRepository.create({
       userId,
       ...profileData,
+      interestVector,
     });
 
     await UserRepository.updateOnboardingCompleted(userId, true);
@@ -53,6 +69,24 @@ export class ProfileService {
   }
 
   static async updateProfile(userId: string, profileData: UpdateProfileData): Promise<IProfile> {
+    // If interest-related fields changed, regenerate the vector
+    if (profileData.categories || profileData.subcategories || profileData.freeTextInterest !== undefined) {
+      const currentProfile = await ProfileRepository.findByUserId(userId);
+      if (currentProfile) {
+        const categories = profileData.categories ?? currentProfile.categories ?? [];
+        const subcategories = profileData.subcategories ?? currentProfile.subcategories ?? [];
+        const freeText = profileData.freeTextInterest !== undefined
+          ? profileData.freeTextInterest
+          : currentProfile.freeTextInterest;
+
+        try {
+          profileData.interestVector = await buildUserVector(categories, subcategories, freeText || undefined);
+        } catch (err) {
+          console.error('[ProfileService] Failed to regenerate interest vector:', err);
+        }
+      }
+    }
+
     const profile = await ProfileRepository.update(userId, profileData);
     if (!profile) {
       throw new NotFoundError('Profile not found');
@@ -76,9 +110,9 @@ export class ProfileService {
       id: userId,
       name: user.name,
       avatar: user.avatar,
-      bio: profile.bio,
-      conversationTitle: profile.conversationTitle,
-      interests: profile.interests
+      categories: profile.categories,
+      subcategories: profile.subcategories,
+      freeTextInterest: profile.freeTextInterest,
     };
   }
 }

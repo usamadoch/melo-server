@@ -14,4 +14,5 @@ export const env = {
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || '',
   S3_BUCKET_NAME: process.env.S3_BUCKET_NAME || '',
   S3_ENDPOINT: process.env.S3_ENDPOINT || undefined,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
 };

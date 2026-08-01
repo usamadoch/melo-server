@@ -3,17 +3,21 @@ import { Profile, type IProfile } from '../models/Profile.js';
 
 export interface CreateProfileData {
   userId: string;
-  bio?: string;
-  conversationTitle?: string;
-  interests: string[];
+
+  categories: string[];
+  subcategories: string[];
+  freeTextInterest?: string;
+  interestVector?: number[];
   showOnExplore: boolean;
   allowRandomMatching: boolean;
 }
 
 export interface UpdateProfileData {
-  bio?: string;
-  conversationTitle?: string;
-  interests?: string[];
+
+  categories?: string[];
+  subcategories?: string[];
+  freeTextInterest?: string;
+  interestVector?: number[];
   showOnExplore?: boolean;
   allowRandomMatching?: boolean;
 }
@@ -31,7 +35,7 @@ export class ProfileRepository {
     return Profile.findOneAndUpdate(
       { userId },
       profileData,
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     ).exec();
   }
 
@@ -63,16 +67,17 @@ export class ProfileRepository {
                 id: '$userId',
                 name: '$user.name',
                 avatar: '$user.avatar',
-                bio: 1,
-                conversationTitle: 1,
-                interests: 1,
+
+                categories: 1,
+                subcategories: 1,
+                freeTextInterest: 1,
                 exploreThumbnail: 1
               }
             }
           ],
           categories: [
-            { $unwind: '$interests' },
-            { $group: { _id: '$interests' } },
+            { $unwind: '$categories' },
+            { $group: { _id: '$categories' } },
             { $project: { _id: 0, category: '$_id' } }
           ]
         }

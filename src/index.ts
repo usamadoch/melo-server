@@ -10,6 +10,7 @@ import interestsRoutes from './interests/interestsRoutes.js';
 import reportsRoutes from './reports/reportsRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { setupMatchingHandler } from './sockets/matchingHandler.js';
+import { startMatchingSweep, stopMatchingSweep } from './matching/matchingService.js';
 import { setupChatRequestHandler } from './sockets/chatRequestHandler.js';
 import { addOnlineUser, removeOnlineUser, getUserIdFromSocket } from './sockets/onlineUsersManager.js';
 import jwt from 'jsonwebtoken';
@@ -70,6 +71,7 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/melotv';
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
+    startMatchingSweep();
     server.listen(PORT, () => {
       console.log(`Server listening on port ${PORT}`);
     });
@@ -81,6 +83,7 @@ mongoose.connect(MONGO_URI)
 // Graceful shutdown handling for Nodemon and PM2
 const gracefulShutdown = () => {
   console.log('Shutting down gracefully...');
+  stopMatchingSweep();
   server.close(() => {
     mongoose.connection.close(false).then(() => {
       console.log('Closed server and database connections.');

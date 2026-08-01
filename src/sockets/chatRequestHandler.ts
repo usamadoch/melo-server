@@ -33,8 +33,8 @@ export function setupChatRequestHandler(io: Server, socket: Socket) {
       id: userId,
       name: user?.name || 'Unknown User',
       avatarUrl: user?.avatar,
-      info: profile?.bio || '',
-      tags: profile?.interests || [],
+      info: '',
+      tags: profile?.categories || [],
       availability: 'available'
     };
 
