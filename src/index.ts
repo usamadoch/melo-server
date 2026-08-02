@@ -13,6 +13,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { setupMatchingHandler } from './sockets/matchingHandler.js';
 import { startMatchingSweep, stopMatchingSweep } from './matching/matchingService.js';
 import { setupChatRequestHandler } from './sockets/chatRequestHandler.js';
+import { setupChatMessageHandler } from './sockets/chatMessageHandler.js';
 import { addOnlineUser, removeOnlineUser, getUserIdFromSocket } from './sockets/onlineUsersManager.js';
 import { startSybilJob } from './matching/sybilDetectionJob.js';
 import jwt from 'jsonwebtoken';
@@ -58,6 +59,7 @@ io.on('connection', (socket) => {
 
   setupMatchingHandler(io, socket);
   setupChatRequestHandler(io, socket);
+  setupChatMessageHandler(io, socket);
 
   socket.on('disconnect', () => {
     const userId = getUserIdFromSocket(socket.id);

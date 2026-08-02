@@ -6,6 +6,10 @@ export interface IReport extends Document {
   reason: 'nudity' | 'harassment' | 'spam' | 'hate_speech' | 'fake_camera' | 'other';
   text?: string;
   matchType: 'current' | 'previous';
+  severityTier: 'MINOR' | 'MODERATE' | 'SEVERE' | 'CRITICAL';
+  status: 'PENDING' | 'RESOLVED';
+  outcome?: 'UPHELD' | 'DISMISSED' | null;
+  resolvedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,7 +24,11 @@ const ReportSchema: Schema = new Schema(
       required: true 
     },
     text: { type: String },
-    matchType: { type: String, enum: ['current', 'previous'], required: true }
+    matchType: { type: String, enum: ['current', 'previous'], required: true },
+    severityTier: { type: String, enum: ['MINOR', 'MODERATE', 'SEVERE', 'CRITICAL'], default: 'MINOR' },
+    status: { type: String, enum: ['PENDING', 'RESOLVED'], default: 'PENDING' },
+    outcome: { type: String, enum: ['UPHELD', 'DISMISSED', null], default: null },
+    resolvedAt: { type: Date }
   },
   { timestamps: true }
 );

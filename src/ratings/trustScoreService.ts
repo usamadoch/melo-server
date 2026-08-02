@@ -43,8 +43,15 @@ export const updateTrustScoreForUser = async (userId: string | mongoose.Types.Ob
 
     const existingSignal = await TrustSignalRepository.findByUserId(objectId);
     const repeatConnectionScore = existingSignal ? existingSignal.repeatConnectionScore : 0;
+    const decayedReportScore = existingSignal ? existingSignal.decayedReportScore : 0;
+    const durationSignalDecayed = existingSignal ? existingSignal.durationSignalDecayed : 0;
+    const moderationPenalty = existingSignal ? existingSignal.moderationPenalty : 0;
 
-    const earnedTrust = Math.min(100, wilsonScore + repeatConnectionScore);
+    // Normalization of duration signal (e.g. max +20 boost)
+    const normalizedDurationBonus = Math.min(20, durationSignalDecayed / 3600 * 5); // Example scaling
+
+    const rawEarnedTrust = wilsonScore + repeatConnectionScore + normalizedDurationBonus - decayedReportScore - moderationPenalty;
+    const earnedTrust = Math.max(0, Math.min(100, rawEarnedTrust));
     const effectiveTrust = baseTrust * (1 - trustMaturity) + earnedTrust * trustMaturity;
 
     await TrustSignalRepository.upsertTrustSignal(objectId, {
@@ -55,6 +62,9 @@ export const updateTrustScoreForUser = async (userId: string | mongoose.Types.Ob
       trustMaturity,
       effectiveTrust,
       repeatConnectionScore,
+      decayedReportScore,
+      durationSignalDecayed,
+      moderationPenalty,
       lastComputed: new Date()
     });
   } catch (error) {
