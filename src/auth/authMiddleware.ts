@@ -29,6 +29,13 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     }
 
     req.user = user;
+    
+    // Non-blocking fingerprint capture
+    import('../middlewares/fingerprintMiddleware.js').then(({ captureFingerprint }) => {
+      // Mock Express res and next since we are just calling it as a detached promise
+      captureFingerprint(req, res, () => {}).catch(err => console.error(err));
+    });
+
     next();
   } catch (error) {
     next(new UnauthorizedError('Invalid token'));

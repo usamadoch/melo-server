@@ -41,6 +41,17 @@ export class AuthService {
         isVerified: payload.email_verified || false,
         onboardingCompleted: false,
       });
+
+      // Hook: Trigger initial trust score generation (Trust Bootstrap)
+      import('../ratings/trustScoreService.js').then(({ updateTrustScoreForUser }) => {
+        updateTrustScoreForUser(user!._id).catch(err => {
+          console.error(`Failed to generate initial trust score for user ${user!._id}:`, err);
+        });
+      });
+    }
+
+    if (!user) {
+      throw new BadRequestError('Failed to create or retrieve user');
     }
 
     const secret = env.JWT_SECRET as string;

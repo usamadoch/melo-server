@@ -14,6 +14,7 @@ import { setupMatchingHandler } from './sockets/matchingHandler.js';
 import { startMatchingSweep, stopMatchingSweep } from './matching/matchingService.js';
 import { setupChatRequestHandler } from './sockets/chatRequestHandler.js';
 import { addOnlineUser, removeOnlineUser, getUserIdFromSocket } from './sockets/onlineUsersManager.js';
+import { startSybilJob } from './matching/sybilDetectionJob.js';
 import jwt from 'jsonwebtoken';
 
 dotenv.config();
@@ -74,6 +75,7 @@ mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
     startMatchingSweep();
+    startSybilJob();
     server.listen(PORT, () => {
       console.log(`Server listening on port ${PORT}`);
     });

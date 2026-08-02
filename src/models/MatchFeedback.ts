@@ -8,6 +8,7 @@ export interface IMatchFeedback extends Document {
   currentState: 'LIKE' | 'DISLIKE' | 'NONE';
   reasonCode: 'NUDITY_INAPPROPRIATE' | 'HARASSMENT' | 'DIFFERENT_INTERESTS' | 'CONNECTION_ISSUE' | null;
   finalized: boolean;
+  ignoredInTrustScore: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,7 +25,8 @@ const MatchFeedbackSchema: Schema = new Schema(
       enum: ['NUDITY_INAPPROPRIATE', 'HARASSMENT', 'DIFFERENT_INTERESTS', 'CONNECTION_ISSUE', null],
       default: null
     },
-    finalized: { type: Boolean, default: false }
+    finalized: { type: Boolean, default: false },
+    ignoredInTrustScore: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
